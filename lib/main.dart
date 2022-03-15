@@ -1,136 +1,89 @@
-import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MaterialApp(
+    title: 'Test',
+    // home: Home(),
+    initialRoute: '/',
+    routes: {
+      '/': (context) => const Home(),
+      '/detail': (context) => const Detail()
+    },
+  ));
 }
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Startup Name Generator',
-      theme: ThemeData(
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white
-        )
-      ),
-      home: const RandomWords(),
-    );
-  }
-}
-class RandomWords extends StatefulWidget {
-  const RandomWords({Key? key}) : super(key: key);
+class Home extends StatefulWidget {
+  const Home({Key? key}) : super(key: key);
 
   @override
-  State<RandomWords> createState() => _RandomWordsState();
+  State<Home> createState() => _HomeState();
 }
 
-class _RandomWordsState extends State<RandomWords> {
-  final _suggestions = <WordPair>[];
-  final _saved = <WordPair>{};
-  final _biggerFont = const TextStyle(fontSize: 10.0);
-  void _pushSaved() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) {
-          final tiles = _saved.map(
-                (pair) {
-              return ListTile(
-                title: Text(
-                  pair.asPascalCase,
-                  style: _biggerFont,
-                ),
-              );
-            },
-          );
-          final divided = tiles.isNotEmpty
-              ? ListTile.divideTiles(
-            context: context,
-            tiles: tiles,
-          ).toList()
-              : <Widget>[];
-
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('Saved Suggestions'),
-            ),
-            body: ListView(children: divided),
-          );
-        },
-      ),
-    );
-  }
+class _HomeState extends State<Home> {
+  Color _myColor = Colors.red;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Liste entreprise'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.list),
-            onPressed: _pushSaved,
-            tooltip: 'Saved Suggestions',
-          ),
-          IconButton(
-            icon: const Icon(Icons.add_alert),
-            tooltip: 'Show Detail',
-            onPressed: () => showDialog<String>(
-              context: context,
-              builder: (BuildContext context) => AlertDialog(
-                title: const Text('AlertDialog Title'),
-                content: const Text('AlertDialog description'),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, 'Cancel'),
-                    child: const Text('Cancel'),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, 'OK'),
-                    child: const Text('OK'),
-                  ),
-                ],
-              ),
-            ),
-          )
-        ],
+        title: const Text('Hello'),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(5.0),
-        itemBuilder: /*1*/ (context, i) {
-          if (i.isOdd) return const Divider(); /*2*/
-
-          final index = i ~/ 2; /*3*/
-          if (index >= _suggestions.length) {
-            _suggestions.addAll(generateWordPairs().take(10)); /*4*/
-          }
-
-          final alreadySaved = _saved.contains(_suggestions[index]);
-
-          return ListTile(
-            title: Text(
-              _suggestions[index].asPascalCase,
-              style: _biggerFont,
-            ),
-            trailing: Icon(
-              alreadySaved ? Icons.favorite : Icons.favorite_border,
-              color: alreadySaved ? Colors.red : null,
-              semanticLabel: alreadySaved ? 'Remove from saved' : 'Save',
-            ),
-            onTap: () {
-              setState(() {
-                if(alreadySaved) {
-                  _saved.remove(_suggestions[index]);
-                } else {
-                  _saved.add(_suggestions[index]);
-                }
-              });
-            },
-          );
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.pushNamed(context, '/detail');
+          },
+          child: const Text('Home'),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+            setState(() {
+              _myColor = Colors.green;
+            });
         },
+        backgroundColor: _myColor,
+        child: Icon(Icons.add_circle),
       ),
     );
   }
 }
+
+class Detail extends StatefulWidget {
+  const Detail({Key? key}) : super(key: key);
+
+  @override
+  State<Detail> createState() => _DetailState();
+}
+
+class _DetailState extends State<Detail> {
+  final List<String> entries = <String>['A', 'B', 'C'];
+  final List<int> colorCodes = <int>[600, 500, 100];
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Detail'),
+      ),
+      body:  ListView.separated(
+        itemCount: entries.length,
+        itemBuilder: (BuildContext context, index) {
+          return Container(
+            height: 50,
+            color: Colors.amber[colorCodes[index]],
+            child: Center(child: Text('Entry ${entries[index]}')),
+          );
+        },
+        padding: const EdgeInsets.all(8),
+        separatorBuilder: (context, index) => const Divider(),
+
+      )
+    );
+  }
+}
+// Center(
+// child: ElevatedButton(
+// onPressed: () {
+// Navigator.pop(context);
+// },
+// child: const Text('Retour'),
+// ),
+// ),
